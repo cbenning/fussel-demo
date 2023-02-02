@@ -1,24 +1,24 @@
 {
   "files": {
-    "main.css": "/fussel-demo/static/css/main.d58fd8eb.chunk.css",
-    "main.js": "/fussel-demo/static/js/main.86c653c6.chunk.js",
-    "main.js.map": "/fussel-demo/static/js/main.86c653c6.chunk.js.map",
-    "runtime-main.js": "/fussel-demo/static/js/runtime-main.4921818d.js",
-    "runtime-main.js.map": "/fussel-demo/static/js/runtime-main.4921818d.js.map",
-    "static/css/2.b35a2e9f.chunk.css": "/fussel-demo/static/css/2.b35a2e9f.chunk.css",
-    "static/js/2.2ab9230b.chunk.js": "/fussel-demo/static/js/2.2ab9230b.chunk.js",
-    "static/js/2.2ab9230b.chunk.js.map": "/fussel-demo/static/js/2.2ab9230b.chunk.js.map",
-    "index.html": "/fussel-demo/index.html",
-    "static/css/2.b35a2e9f.chunk.css.map": "/fussel-demo/static/css/2.b35a2e9f.chunk.css.map",
-    "static/css/main.d58fd8eb.chunk.css.map": "/fussel-demo/static/css/main.d58fd8eb.chunk.css.map",
-    "static/js/2.2ab9230b.chunk.js.LICENSE.txt": "/fussel-demo/static/js/2.2ab9230b.chunk.js.LICENSE.txt",
-    "static/media/animal-track-transparent-2.e16fa77f.png": "/fussel-demo/static/media/animal-track-transparent-2.e16fa77f.png"
+    "main.css": "/static/css/main.d58fd8eb.chunk.css",
+    "main.js": "/static/js/main.15c767c4.chunk.js",
+    "main.js.map": "/static/js/main.15c767c4.chunk.js.map",
+    "runtime-main.js": "/static/js/runtime-main.2845e0d6.js",
+    "runtime-main.js.map": "/static/js/runtime-main.2845e0d6.js.map",
+    "static/css/2.b35a2e9f.chunk.css": "/static/css/2.b35a2e9f.chunk.css",
+    "static/js/2.4e9e2835.chunk.js": "/static/js/2.4e9e2835.chunk.js",
+    "static/js/2.4e9e2835.chunk.js.map": "/static/js/2.4e9e2835.chunk.js.map",
+    "index.html": "/index.html",
+    "static/css/2.b35a2e9f.chunk.css.map": "/static/css/2.b35a2e9f.chunk.css.map",
+    "static/css/main.d58fd8eb.chunk.css.map": "/static/css/main.d58fd8eb.chunk.css.map",
+    "static/js/2.4e9e2835.chunk.js.LICENSE.txt": "/static/js/2.4e9e2835.chunk.js.LICENSE.txt",
+    "static/media/animal-track-transparent-2.e16fa77f.png": "/static/media/animal-track-transparent-2.e16fa77f.png"
   },
   "entrypoints": [
-    "static/js/runtime-main.4921818d.js",
+    "static/js/runtime-main.2845e0d6.js",
     "static/css/2.b35a2e9f.chunk.css",
-    "static/js/2.2ab9230b.chunk.js",
+    "static/js/2.4e9e2835.chunk.js",
     "static/css/main.d58fd8eb.chunk.css",
-    "static/js/main.86c653c6.chunk.js"
+    "static/js/main.15c767c4.chunk.js"
   ]
 }
