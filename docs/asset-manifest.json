@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/fussel-demo/static/css/main.d58fd8eb.chunk.css",
-    "main.js": "/fussel-demo/static/js/main.82e2c673.chunk.js",
-    "main.js.map": "/fussel-demo/static/js/main.82e2c673.chunk.js.map",
+    "main.js": "/fussel-demo/static/js/main.e7297afe.chunk.js",
+    "main.js.map": "/fussel-demo/static/js/main.e7297afe.chunk.js.map",
     "runtime-main.js": "/fussel-demo/static/js/runtime-main.4921818d.js",
     "runtime-main.js.map": "/fussel-demo/static/js/runtime-main.4921818d.js.map",
     "static/css/2.b35a2e9f.chunk.css": "/fussel-demo/static/css/2.b35a2e9f.chunk.css",
@@ -19,6 +19,6 @@
     "static/css/2.b35a2e9f.chunk.css",
     "static/js/2.4e9e2835.chunk.js",
     "static/css/main.d58fd8eb.chunk.css",
-    "static/js/main.82e2c673.chunk.js"
+    "static/js/main.e7297afe.chunk.js"
   ]
 }
