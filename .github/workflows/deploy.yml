@@ -1,0 +1,159 @@
+name: Deploy demo
+
+# Builds the demo site with the latest Fussel release and publishes it to GitHub Pages.
+#  - Daily: checks for a newer Fussel release and rebuilds only if there is one.
+#  - On push: rebuilds when the demo photos or this workflow change.
+#  - Manually: optionally pass a Fussel version to build.
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  push:
+    branches: [main]
+    paths:
+      - demo-photos/**
+      - .github/workflows/deploy.yml
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Fussel version to build, e.g. 3.1.0 (default: latest release)"
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-demo
+  cancel-in-progress: false
+
+jobs:
+  check:
+    name: Check for new release
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.resolve.outputs.version }}
+      build: ${{ steps.resolve.outputs.build }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve version
+        id: resolve
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          version="${INPUT_VERSION:-}"
+          if [ -z "$version" ]; then
+            version="$(gh release view -R cbenning/fussel --json tagName -q .tagName)"
+          fi
+          version="${version#v}"
+          current="$(cat FUSSEL_VERSION 2>/dev/null || true)"
+          echo "latest=$version deployed=${current:-none}"
+
+          build=true
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "$version" = "$current" ]; then
+            echo "Already deployed, nothing to do."
+            build=false
+          elif ! docker manifest inspect "ghcr.io/cbenning/fussel:$version" >/dev/null 2>&1; then
+            echo "::warning::Image ghcr.io/cbenning/fussel:$version not found yet, will retry on the next run."
+            build=false
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "build=$build" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: Build site
+    needs: check
+    if: needs.check.outputs.build == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate site with Fussel ${{ needs.check.outputs.version }}
+        run: |
+          set -euo pipefail
+          mkdir -p site
+          docker run --rm \
+            -v "$PWD/demo-photos":/input:ro \
+            -v "$PWD/site":/output \
+            -e PUID="$(id -u)" \
+            -e PGID="$(id -g)" \
+            -e INPUT_PATH="/input" \
+            -e OUTPUT_PATH="/output" \
+            -e SITE_TITLE="Fussel Demo" \
+            -e SITE_ROOT="/fussel-demo/" \
+            -e FACE_TAG_ENABLE="True" \
+            -e WATERMARK_ENABLE="True" \
+            -e PARALLEL_TASKS="4" \
+            "ghcr.io/cbenning/fussel:${{ needs.check.outputs.version }}"
+          test -f site/index.html
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: [check, build]
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+  record:
+    name: Record deployed version
+    needs: [check, deploy]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Commit FUSSEL_VERSION
+        run: |
+          set -euo pipefail
+          echo "${{ needs.check.outputs.version }}" > FUSSEL_VERSION
+          if git diff --quiet -- FUSSEL_VERSION && [ -n "$(git ls-files FUSSEL_VERSION)" ]; then
+            echo "Version unchanged."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add FUSSEL_VERSION
+          git commit -m "Deployed Fussel ${{ needs.check.outputs.version }}"
+          git push
+
+  keepalive:
+    name: Keep scheduled runs enabled
+    needs: check
+    if: github.event_name == 'schedule' && needs.check.outputs.build == 'false'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      # GitHub disables scheduled workflows in public repos after 60 days without
+      # repository activity. Fussel releases can be months apart, so commit
+      # a small marker when the last commit is older than 45 days.
+      - name: Commit marker if repository has been quiet
+        run: |
+          set -euo pipefail
+          last="$(git log -1 --format=%ct)"
+          age_days=$(( ( $(date +%s) - last ) / 86400 ))
+          echo "Last commit is $age_days days old."
+          if [ "$age_days" -lt 45 ]; then
+            exit 0
+          fi
+          date -u +%Y-%m-%d > .last-checked
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .last-checked
+          git commit -m "Keep scheduled workflow active"
+          git push
